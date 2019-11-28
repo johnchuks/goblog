@@ -14,6 +14,7 @@ type IBoltClient interface {
 	OpenBoltDb()
 	QueryAccount(accountId string) []byte
 	Seed()
+	UpdateAccount(accountId string) ([]byte, error)
 }
 
 type BoltClient struct {
@@ -85,3 +86,19 @@ func (bc *BoltClient) QueryAccount(accountId string) (val []byte) {
 	})
 	return val
 }
+
+func (bc *BoltClient) UpdateAccount(accountId string) (val []byte, err error) {
+		err = bc.boltDB.Update(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("AccountBucket"))
+			err := b.Put([]byte(accountId), []byte("Johnbosco"))
+			if err != nil {
+				return err
+			}
+			val = b.Get([]byte(accountId))
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+		return val, nil
+} 

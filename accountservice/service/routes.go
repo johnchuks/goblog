@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -38,6 +39,14 @@ var routes = Routes{
 		"/accounts/{accountId}",
 		func (w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application.json; charset=UTF-8")
+				params := mux.Vars(r)
+				accountId := params["accountId"]
+				account, err := DBClient.UpdateAccount(accountId)
+				if err != nil {
+					log.Fatal(err)
+				} else {
+					w.Write(account)
+				}
 		},
 	},
 }
