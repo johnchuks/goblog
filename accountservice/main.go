@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/callistaenterprise/goblog/accountservice/dbclient"
+	"github.com/johnchuks/goblog/accountservice/dbclient"
 	"fmt"
-	"github.com/callistaenterprise/goblog/accountservice/service"
+	"github.com/johnchuks/goblog/accountservice/service"
 )
 
 var appName = "accountservice"

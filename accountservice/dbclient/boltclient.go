@@ -1,31 +1,32 @@
 package dbclient
 
 import (
-	"github.com/callistaenterprise/goblog/accountservice/model"
-	"github.com/boltdb/bolt"
-	"log"
-	"fmt"
-	"strconv"
 	"encoding/json"
+	"fmt"
+	"log"
+	"strconv"
+
+	"github.com/boltdb/bolt"
+	"github.com/johnchuks/goblog/accountservice/model"
 )
 
 type IBoltClient interface {
-		OpenBoltDb()
-		QueryAccount(accountId string) []byte
-		Seed()
+	OpenBoltDb()
+	QueryAccount(accountId string) []byte
+	Seed()
 }
 
 type BoltClient struct {
-		boltDB *bolt.DB
+	boltDB *bolt.DB
 }
 
 func (bc *BoltClient) OpenBoltDb() {
-		var err error
-		bc.boltDB, err = bolt.Open("accounts.db", 0600, nil)
-		
-		if err != nil {
-				log.Fatal(err)
-		}
+	var err error
+	bc.boltDB, err = bolt.Open("accounts.db", 0600, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
@@ -35,13 +36,13 @@ func (bc *BoltClient) Seed() {
 }
 
 func (bc *BoltClient) initializeBucket() {
-		bc.boltDB.Update(func(tx *bolt.Tx) error {
-				_, err := tx.CreateBucket([]byte("AccountBucket"))
-				if err != nil {
-						return fmt.Errorf("create bucket failed: %s", err)
-				}
-				return nil
-		})
+	bc.boltDB.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucket([]byte("AccountBucket"))
+		if err != nil {
+			return fmt.Errorf("create bucket failed: %s", err)
+		}
+		return nil
+	})
 }
 
 // Seed (n) make-believe account objects into the AcountBucket bucket.
@@ -55,8 +56,8 @@ func (bc *BoltClient) seedAccounts() {
 
 		// Create an instance of our Account struct
 		acc := model.Account{
-						Id: key,
-						Name: "Person_" + strconv.Itoa(i),
+			Id:   key,
+			Name: "Person_" + strconv.Itoa(i),
 		}
 
 		// Serialize the struct to JSON
@@ -64,26 +65,23 @@ func (bc *BoltClient) seedAccounts() {
 
 		// Write the data to the AccountBucket
 		bc.boltDB.Update(func(tx *bolt.Tx) error {
-						b := tx.Bucket([]byte("AccountBucket"))
-						err := b.Put([]byte(key), jsonBytes)
-						return err
+			b := tx.Bucket([]byte("AccountBucket"))
+			err := b.Put([]byte(key), jsonBytes)
+			return err
 		})
 	}
 	fmt.Printf("Seeded %v fake accounts...\n", total)
 }
 
-//Get Account information from bucket with accountID
+// "QueryAccount" Get Account information from bucket with accountID
 func (bc *BoltClient) QueryAccount(accountId string) (val []byte) {
-		err := bc.boltDB.View(func(tx *bolt.Tx) error {
-				b := tx.Bucket([]byte("AccountBucket"))
-				if b == nil {
-					return fmt.Errorf("bucket not found")
-				}
-				val = b.Get([]byte(accountId))
-				return nil
-		})
-		if err != nil {
-			log.Fatal(err)
+	bc.boltDB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("AccountBucket"))
+		if b == nil {
+			return fmt.Errorf("bucket not found")
 		}
-		return val
+		val = b.Get([]byte(accountId))
+		return nil
+	})
+	return val
 }

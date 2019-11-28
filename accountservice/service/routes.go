@@ -36,10 +36,8 @@ var routes = Routes{
 		"UpdateAccount",
 		"PUT",
 		"/accounts/{accountId}",
-		func (w http.ResponseWriter, r *hhtp.Request) {
+		func (w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application.json; charset=UTF-8")
-				params := mux.Vars(r)
-				accountId := params["accountId"]
 		},
 	},
 }
