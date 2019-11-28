@@ -90,7 +90,13 @@ func (bc *BoltClient) QueryAccount(accountId string) (val []byte) {
 func (bc *BoltClient) UpdateAccount(accountId string) (val []byte, err error) {
 		err = bc.boltDB.Update(func(tx *bolt.Tx) error {
 			b := tx.Bucket([]byte("AccountBucket"))
-			err := b.Put([]byte(accountId), []byte("Johnbosco"))
+			acc := model.Account{
+					Id: accountId,
+					Name:"Johnbosco ohia",
+			}
+			// Serialize the struct to JSON
+		jsonBytes, _ := json.Marshal(acc)
+			err := b.Put([]byte(accountId), []byte(jsonBytes))
 			if err != nil {
 				return err
 			}
